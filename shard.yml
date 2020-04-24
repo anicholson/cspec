@@ -1,0 +1,10 @@
+name: cspec
+version: 0.1.0
+
+authors:
+  - Andy Nicholson <andrew@anicholson.net>
+
+description: |
+  Write Crystal specs to specify compile-time behaviour.
+
+license: Hippocratic License v1.2
