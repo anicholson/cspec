@@ -6,5 +6,5 @@ shards:
 
   version_tools:
     github: anicholson/crystal-version-tools
-    version: 0.1.0
+    version: 0.1.1
 

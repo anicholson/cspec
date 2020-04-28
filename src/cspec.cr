@@ -1,19 +1,24 @@
 require "uuid"
 require "file_utils"
 
+require "./debug"
+
 module CSpec
-  macro at_compile_time(description, should_build = true, &block)
+  macro at_compile_time(description, should_build = false, debug = false, cleanup = true, &block)
     {% annotated_name = "[C] " + description %}
 
     describe {{annotated_name}} do
+      {% if debug %}
+        debugger = CSpec::DEBUG
+      {% else %}
+        debugger = CSpec::NopDebugger.new
+      {% end %}
+
       test_id = UUID.random
       tempdir_path = Path.new("./spec").expand
 
-      file_path = Path.new(tempdir_path, "#{test_id}_compile_time_spec.cr")
-
-      at_exit do
-        FileUtils.rm(file_path.to_s)
-      end
+      file_name = "#{test_id}_compile_time_spec"
+      file_path = Path.new(tempdir_path, "#{file_name}.cr")
 
       {% expressions = block.body.is_a?(Expressions) ? block.body.expressions : [block.body] %}
       {% spec_blocks = [] of Call %}
@@ -34,16 +39,19 @@ module CSpec
           end
       {% end %}
 
-      output = String::Builder.new
-      err = String::Builder.new
-      result = Process.run("crystal", ["build", "--error-trace", "--no-color", file_path.expand.to_s], nil, false, true, Process::Redirect::Close, output, err, Dir.current)
+      stdout_sb = String::Builder.new
+      stderr_sb = String::Builder.new
+      result = Process.run("crystal", ["build", "--error-trace", "--no-color", file_path.expand.to_s], nil, false, true, Process::Redirect::Close, stdout_sb, stderr_sb, Dir.current)
 
-      output = output.to_s
-      err = err.to_s
+      stdout : String = stdout_sb.to_s
+      stderr : String = stderr_sb.to_s
+
+      debugger.info { "STDOUT: \n #{output}" }
+      debugger.info { "STDERR: \n #{err}" }
 
       describe "basic checks" do
         it "creates output" do
-          some_output = !(output.empty? && err.empty?)
+          some_output = !(stdout.empty? && stderr.empty?)
           some_output.should eq(true)
         end
 
@@ -61,6 +69,22 @@ module CSpec
       {% for spec in spec_blocks %}
         {{ spec }}
       {% end %}
+
+
+      at_exit do
+        {% if cleanup == false %}
+          warning = <<-WARNING
+Generated spec for '{{description}}' has been left at #{file_path}.
+Please remove it before running `crystal spec` again, otherwise it will be
+executed next time (and cause you a lot of confusion!)
+WARNING
+          debugger.warn { warning }
+        {% else %}
+          debugger.info { "Deleting temporary spec #{file_path}" }
+          FileUtils.rm(file_path.to_s)
+          FileUtils.rm(file_name) if result.success?
+        {% end %}
+      end
     end
   end
 end
