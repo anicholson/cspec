@@ -7,4 +7,10 @@ authors:
 description: |
   Write Crystal specs to specify compile-time behaviour.
 
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba
+    version: ~> 0.12.0
+
+
 license: Hippocratic License v1.2
