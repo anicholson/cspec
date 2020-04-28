@@ -1,0 +1,10 @@
+* CHANGELOG
+
+** 0.0.2 - April 28, 2020
+
+- Rename ~output~ and ~err~ to ~stdout~ and ~stderr~, respectively.
+- Add ~debug~ & ~cleanup~ options to enable better debugging
+
+** 0.0.1
+
+- Initial version
