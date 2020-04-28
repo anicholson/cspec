@@ -1,11 +1,16 @@
 name: cspec
-version: 0.1.0
+version: 0.0.1
 
 authors:
   - Andy Nicholson <andrew@anicholson.net>
 
 description: |
   Write Crystal specs to specify compile-time behaviour.
+
+dependencies:
+  version_tools:
+    github: anicholson/crystal-version-tools
+    version: ~> 0.1.0
 
 development_dependencies:
   ameba:
