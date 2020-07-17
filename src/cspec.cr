@@ -46,8 +46,8 @@ module CSpec
       stdout : String = stdout_sb.to_s
       stderr : String = stderr_sb.to_s
 
-      debugger.info { "STDOUT: \n #{output}" }
-      debugger.info { "STDERR: \n #{err}" }
+      debugger.info { "STDOUT: \n #{stdout}" }
+      debugger.info { "STDERR: \n #{stderr}" }
 
       describe "basic checks" do
         it "creates output" do
