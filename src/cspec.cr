@@ -50,11 +50,6 @@ module CSpec
       debugger.info { "STDERR: \n #{stderr}" }
 
       describe "basic checks" do
-        it "creates output" do
-          some_output = !(stdout.empty? && stderr.empty?)
-          some_output.should eq(true)
-        end
-
         {% if should_build %}
           it "succeeds" do
             result.success?.should eq(true)
@@ -62,6 +57,11 @@ module CSpec
         {% else %}
           it "fails" do
             result.success?.should eq(false)
+          end
+
+          it "outputs some indication of failure" do
+            some_output = !(stdout.empty? && stderr.empty?)
+            some_output.should eq(true)
           end
         {% end %}
       end
